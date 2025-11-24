@@ -121,7 +121,23 @@ constructor(
             setAlpha(getTargetClockFace(clock).views, 1F)
             setAlpha(getNonTargetClockFace(clock).views, 0F)
 
-            if (keyguardClockViewModel.isLargeClockVisible.value) {
+            if (!keyguardClockViewModel.isLargeClockVisible.value) {
+                if (keyguardClockViewModel.shouldDateWeatherBeBelowSmallClock.value) {
+                    connect(
+                        sharedR.id.bc_smartspace_view,
+                        TOP,
+                        sharedR.id.date_smartspace_view,
+                        BOTTOM,
+                    )
+                } else {
+                    connect(
+                        sharedR.id.bc_smartspace_view,
+                        TOP,
+                        ClockViewIds.LOCKSCREEN_CLOCK_VIEW_SMALL,
+                        BOTTOM,
+                    )
+                }
+            } else {
                 setScaleX(getTargetClockFace(clock).views, aodBurnInViewModel.movement.value.scale)
                 setScaleY(getTargetClockFace(clock).views, aodBurnInViewModel.movement.value.scale)
             }
@@ -138,6 +154,12 @@ constructor(
 
     private fun constrainWeatherClockDateIconsBarrier(constraints: ConstraintSet) {
         constraints.apply {
+            createBarrier(
+                R.id.weather_clock_bc_smartspace_bottom,
+                Barrier.BOTTOM,
+                context.resources.getDimensionPixelSize(clocksR.dimen.enhanced_smartspace_height),
+                (ClockViewIds.WEATHER_CLOCK_TIME),
+            )
             if (
                 rootViewModel.isNotifIconContainerVisible.value.value &&
                     keyguardClockViewModel.hasAodIcons.value
@@ -200,6 +222,9 @@ constructor(
                     keyguardClockViewModel.getLargeClockTopMargin() +
                         context.resources.getDimensionPixelSize(
                             clocksR.dimen.date_weather_view_height
+                        ) +
+                        context.resources.getDimensionPixelSize(
+                            clocksR.dimen.enhanced_smartspace_height
                         )
                 } else {
                     keyguardClockViewModel.getLargeClockTopMargin()
